@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'core/theme/app_theme.dart';
 import 'providers/route_provider.dart';
 import 'screens/home_screen.dart';
 
 void main() {
-  runApp(const MapsGoApp());
+  runApp(const OptiMapsApp());
 }
 
-class MapsGoApp extends StatelessWidget {
-  const MapsGoApp({super.key});
+class OptiMapsApp extends StatelessWidget {
+  const OptiMapsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +23,7 @@ class MapsGoApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Opti Maps',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorSchemeSeed: Colors.blue,
-        ),
+        theme: AppTheme.lightTheme,
         home: const HomeScreen(),
       ),
     );
