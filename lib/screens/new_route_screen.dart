@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import '../models/route_model.dart';
 import '../models/stop_model.dart';
 import '../providers/route_provider.dart';
+import '../widgets/app_button.dart';
+import '../widgets/app_card.dart';
+import '../widgets/app_text_field.dart';
 
 class NewRouteScreen extends StatefulWidget {
   const NewRouteScreen({super.key});
@@ -28,7 +31,11 @@ addressController.dispose();
 super.dispose();
 }
 
-void addAddress() {
+// =====================================================
+// Métodos
+// =====================================================
+
+void _addStop() {
 if (addressController.text.trim().isEmpty) {
 return;
 }
@@ -46,7 +53,7 @@ addressController.clear();
 });
 }
 
-Future<void> saveRoute() async {
+Future<void> _saveRoute() async {
 if (routeNameController.text.trim().isEmpty) {
 ScaffoldMessenger.of(context).showSnackBar(
 const SnackBar(
@@ -87,79 +94,110 @@ content: Text("Rota salva com sucesso!"),
 Navigator.pop(context);
 }
 
+// =====================================================
+// Interface
+// =====================================================
+
 @override
 Widget build(BuildContext context) {
 return Scaffold(
 appBar: AppBar(
 title: const Text("Nova Rota"),
-centerTitle: true,
 ),
-body: Padding(
-padding: const EdgeInsets.all(20),
-child: Column(
+body: ListView(
+padding: const EdgeInsets.all(16),
 children: [
+_buildRouteNameField(),
 
-TextField(
-controller: routeNameController,
-decoration: const InputDecoration(
-labelText: "Nome da rota",
-border: OutlineInputBorder(),
-),
-),
+const SizedBox(height: 16),
 
-const SizedBox(height: 20),
+_buildAddressField(),
 
-TextField(
-controller: addressController,
-decoration: const InputDecoration(
-labelText: "Endereço",
-border: OutlineInputBorder(),
-),
-),
+const SizedBox(height: 12),
 
-const SizedBox(height: 15),
+_buildAddButton(),
 
-SizedBox(
-width: double.infinity,
-child: ElevatedButton(
-onPressed: addAddress,
-child: const Text("Adicionar Endereço"),
-),
-),
+const SizedBox(height: 24),
 
-const SizedBox(height: 20),
-
-const Align(
-alignment: Alignment.centerLeft,
-child: Text(
+const Text(
 "Paradas",
 style: TextStyle(
-fontSize: 18,
+fontSize: 20,
 fontWeight: FontWeight.bold,
 ),
 ),
+
+const SizedBox(height: 12),
+
+_buildStopsList(),
+
+const SizedBox(height: 24),
+
+_buildSaveButton(),
+],
 ),
+);
+}
 
-const SizedBox(height: 10),
+Widget _buildRouteNameField() {
+return AppTextField(
+controller: routeNameController,
+label: "Nome da rota",
+prefixIcon: Icons.route,
+);
+}
 
-Expanded(
-child: stops.isEmpty
-    ? const Center(
-  child: Text("Nenhum endereço adicionado."),
-)
-    : ListView.builder(
-  itemCount: stops.length,
-  itemBuilder: (context, index) {
+Widget _buildAddressField() {
+return AppTextField(
+controller: addressController,
+label: "Endereço",
+hint: "Digite um endereço",
+prefixIcon: Icons.location_on,
+);
+}
+
+Widget _buildAddButton() {
+return AppButton(
+text: "Adicionar Endereço",
+icon: Icons.add_location_alt,
+onPressed: _addStop,
+);
+}
+  Widget _buildStopsList() {
+    if (stops.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 24),
+        child: Center(
+          child: Text(
+            "Nenhum endereço adicionado.",
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: List.generate(
+        stops.length,
+            (index) => _buildStopCard(index),
+      ),
+    );
+  }
+
+  Widget _buildStopCard(int index) {
     final stop = stops[index];
 
-    return Card(
+    return AppCard(
       child: ListTile(
+        contentPadding: EdgeInsets.zero,
         leading: CircleAvatar(
           child: Text("${index + 1}"),
         ),
         title: Text(stop.address),
         trailing: IconButton(
-          icon: const Icon(Icons.delete),
+          icon: const Icon(
+            Icons.delete,
+            color: Colors.red,
+          ),
           onPressed: () {
             setState(() {
               stops.removeAt(index);
@@ -172,23 +210,13 @@ child: stops.isEmpty
         ),
       ),
     );
-  },
-),
-),
+  }
 
-  const SizedBox(height: 15),
-
-  SizedBox(
-    width: double.infinity,
-    child: ElevatedButton.icon(
-      onPressed: saveRoute,
-      icon: const Icon(Icons.save),
-      label: const Text("Salvar Rota"),
-    ),
-  ),
-],
-),
-),
-);
-}
+  Widget _buildSaveButton() {
+    return AppButton(
+      text: "Salvar Rota",
+      icon: Icons.save,
+      onPressed: _saveRoute,
+    );
+  }
 }
