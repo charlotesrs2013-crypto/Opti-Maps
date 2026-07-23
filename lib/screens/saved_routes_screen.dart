@@ -44,7 +44,7 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("TESTE12345"),
+        title: const Text("Rotas Salvas"),
         centerTitle: true,
       ),
       body: loading
@@ -96,7 +96,7 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (_) => RouteDetailsScreen(
-                      routeName: route.name,
+                      route: route,
                     ),
                   ),
                 );

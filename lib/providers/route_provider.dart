@@ -24,12 +24,24 @@ class RouteProvider extends ChangeNotifier {
       ) async {
     final int routeId = await _routeRepository.insertRoute(route);
 
+    debugPrint("======================================");
+    debugPrint("ROTA SALVA COM SUCESSO");
+    debugPrint("ID DA ROTA: $routeId");
+    debugPrint("TOTAL DE PARADAS: ${stops.length}");
+
     for (int i = 0; i < stops.length; i++) {
       stops[i].routeId = routeId;
       stops[i].order = i + 1;
 
+      debugPrint("------------------------------");
+      debugPrint("PARADA ${i + 1}");
+      debugPrint("Endereço: ${stops[i].address}");
+      debugPrint("RouteId: ${stops[i].routeId}");
+
       await _stopRepository.insertStop(stops[i]);
     }
+
+    debugPrint("======================================");
 
     await loadRoutes();
   }

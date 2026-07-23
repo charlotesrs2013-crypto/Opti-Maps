@@ -1,21 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../models/route_model.dart';
+import '../models/stop_model.dart';
+import '../providers/route_provider.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/stop_card.dart';
 
-class RouteDetailsScreen extends StatelessWidget {
-  final String routeName;
+class RouteDetailsScreen extends StatefulWidget {
+  final RouteModel route;
 
   const RouteDetailsScreen({
     super.key,
-    required this.routeName,
+    required this.route,
   });
+
+  @override
+  State<RouteDetailsScreen> createState() => _RouteDetailsScreenState();
+}
+
+class _RouteDetailsScreenState extends State<RouteDetailsScreen> {
+  bool loading = true;
+  List<StopModel> stops = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadStops();
+  }
+
+  Future<void> loadStops() async {
+    final result = await context.read<RouteProvider>().getStops(widget.route.id!);
+
+    if (!mounted) return;
+
+    setState(() {
+      stops = result;
+      loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(routeName),
+        title: Text(widget.route.name),
         centerTitle: true,
       ),
       body: Padding(
@@ -26,27 +55,25 @@ class RouteDetailsScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
-                  children: const [
-                    Icon(
+                  children: [
+                    const Icon(
                       Icons.route,
                       color: Colors.blue,
                       size: 40,
                     ),
-                    SizedBox(width: 15),
+                    const SizedBox(width: 15),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             "Status",
-                            style: TextStyle(
-                              color: Colors.grey,
-                            ),
+                            style: TextStyle(color: Colors.grey),
                           ),
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           Text(
-                            "Não iniciada",
-                            style: TextStyle(
+                            widget.route.status,
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
                             ),
@@ -62,36 +89,34 @@ class RouteDetailsScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             Expanded(
-              child: ListView(
-                children: [
-                  StopCard(
-                    order: 1,
-                    customerName: "João da Silva",
-                    address: "Rua das Flores, 120",
-                    status: "Pendente",
+              child: loading
+                  ? const Center(
+                child: CircularProgressIndicator(),
+              )
+                  : stops.isEmpty
+                  ? const Center(
+                child: Text(
+                  "Nenhuma parada cadastrada.",
+                  style: TextStyle(fontSize: 18),
+                ),
+              )
+                  : ListView.builder(
+                itemCount: stops.length,
+                itemBuilder: (context, index) {
+                  final stop = stops[index];
+
+                  return StopCard(
+                    order: stop.order,
+                    customerName: stop.customerName?.isNotEmpty == true
+                        ? stop.customerName!
+                        : "Parada ${stop.order}",
+                    address: stop.address,
+                    status: stop.status,
                     onComplete: () {},
                     onEdit: () {},
                     onDelete: () {},
-                  ),
-                  StopCard(
-                    order: 2,
-                    customerName: "Maria Souza",
-                    address: "Av. Brasil, 450",
-                    status: "Pendente",
-                    onComplete: () {},
-                    onEdit: () {},
-                    onDelete: () {},
-                  ),
-                  StopCard(
-                    order: 3,
-                    customerName: "Carlos Pereira",
-                    address: "Rua Goiás, 89",
-                    status: "Pendente",
-                    onComplete: () {},
-                    onEdit: () {},
-                    onDelete: () {},
-                  ),
-                ],
+                  );
+                },
               ),
             ),
 
