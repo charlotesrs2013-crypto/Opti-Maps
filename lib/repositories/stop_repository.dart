@@ -55,6 +55,19 @@ class StopRepository {
     );
   }
 
+  Future<void> completeStop(int stopId) async {
+    final Database db = await _databaseService.database;
+
+    await db.update(
+      'stops',
+      {
+        'status': 'Concluída',
+      },
+      where: 'id = ?',
+      whereArgs: [stopId],
+    );
+  }
+
   Future<void> deleteStop(int id) async {
     final Database db = await _databaseService.database;
 

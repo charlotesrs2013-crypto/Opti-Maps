@@ -30,7 +30,8 @@ class _RouteDetailsScreenState extends State<RouteDetailsScreen> {
   }
 
   Future<void> loadStops() async {
-    final result = await context.read<RouteProvider>().getStops(widget.route.id!);
+    final result =
+    await context.read<RouteProvider>().getStops(widget.route.id!);
 
     if (!mounted) return;
 
@@ -38,6 +39,14 @@ class _RouteDetailsScreenState extends State<RouteDetailsScreen> {
       stops = result;
       loading = false;
     });
+  }
+
+  Future<void> completeStop(StopModel stop) async {
+    if (stop.id == null) return;
+
+    await context.read<RouteProvider>().completeStop(stop.id!);
+
+    await loadStops();
   }
 
   @override
@@ -107,12 +116,15 @@ class _RouteDetailsScreenState extends State<RouteDetailsScreen> {
 
                   return StopCard(
                     order: stop.order,
-                    customerName: stop.customerName?.isNotEmpty == true
+                    customerName:
+                    (stop.customerName?.isNotEmpty ?? false)
                         ? stop.customerName!
                         : "Parada ${stop.order}",
                     address: stop.address,
                     status: stop.status,
-                    onComplete: () {},
+                    onComplete: () async {
+                      await completeStop(stop);
+                    },
                     onEdit: () {},
                     onDelete: () {},
                   );

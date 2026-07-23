@@ -50,6 +50,21 @@ class RouteProvider extends ChangeNotifier {
     return await _stopRepository.getStopsByRoute(routeId);
   }
 
+  Future<void> completeStop(int stopId) async {
+    await _stopRepository.completeStop(stopId);
+    notifyListeners();
+  }
+
+  Future<void> updateStop(StopModel stop) async {
+    await _stopRepository.updateStop(stop);
+    notifyListeners();
+  }
+
+  Future<void> deleteStop(int stopId) async {
+    await _stopRepository.deleteStop(stopId);
+    notifyListeners();
+  }
+
   Future<void> deleteRoute(int routeId) async {
     await _stopRepository.deleteStopsByRoute(routeId);
     await _routeRepository.deleteRoute(routeId);
